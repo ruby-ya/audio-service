@@ -1,0 +1,50 @@
+server:
+  port: 80
+
+spring:
+  datasource:
+    driver-class-name: org.h2.Driver
+    username: root
+    password: root
+    url: jdbc:h2:~/h2/audio
+    schema: classpath:sql/audio_file.sql
+    initialization-mode: never #第一次置为always，以后都用never
+  h2:
+    console:
+      enabled: true
+      settings:
+        web-allow-others: true
+      path: /h2-console
+  jackson:
+    default-property-inclusion: non_null
+
+mybatis-plus:
+  global-config:
+    db-config:
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto
+  configuration:
+    map-underscore-to-camel-case: true
+
+audio:
+  service:
+    sftp: #sftp配置
+      host: 192.168.229.128 #需要备份的源服务器
+      port: 22 #目标端口
+      username: root #用户名 注意！ #用户必须对目录有完全的操作权限！！
+      password: root #密码         #如果创建文件的不是当前用户，那么权限为777或者766即rwxrwxrwx或者rwxrw-rw-，
+                                   #如果不知道如何操作权限，最好用root登录
+      path: /home/belmode/audio/ #需要备份的根目录（必须存在，否则应用无法启动）
+    download: #当前服务的文件存储位置
+      path: /home #需要指定绝对路径（linux以/开头，windows以盘符开头,可以不存在，应用会自动创建）
+
+  cron: 0 0/5 * * * ? #默认是五分钟，扫描一次
+
+
+logging:
+  level:
+    com:
+      example:
+        audioservice:
+          mapper: debug
